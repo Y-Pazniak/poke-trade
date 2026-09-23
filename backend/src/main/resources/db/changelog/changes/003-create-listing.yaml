@@ -1,0 +1,46 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-create-listing
+      author: y-pazniak
+      changes:
+        - createTable:
+            tableName: listing
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: seller_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: pokemon_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: price
+                  type: NUMERIC(10, 2)
+              - column:
+                  name: created_at
+                  type: TIMESTAMPTZ
+                  defaultValueComputed: now()
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            constraintName: fk_listing_seller
+            baseTableName: listing
+            baseColumnNames: seller_id
+            referencedTableName: trainer
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            constraintName: fk_listing_pokemon
+            baseTableName: listing
+            baseColumnNames: pokemon_id
+            referencedTableName: pokemon
+            referencedColumnNames: id
