@@ -3,3 +3,5 @@ databaseChangeLog:
       file: db/changelog/changes/001-create-trainer.yaml
   - include:
       file: db/changelog/changes/002-create-pokemon.yaml
+  - include:
+      file: db/changelog/changes/003-create-listing.yaml
