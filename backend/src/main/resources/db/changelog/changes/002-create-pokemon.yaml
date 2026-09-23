@@ -1,0 +1,42 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-create-pokemon
+      author: y-pazniak
+      changes:
+        - createTable:
+            tableName: pokemon
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: species
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: level
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: owner_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMPTZ
+                  defaultValueComputed: now()
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            constraintName: fk_pokemon_owner
+            baseTableName: pokemon
+            baseColumnNames: owner_id
+            referencedTableName: trainer
+            referencedColumnNames: id
