@@ -18,22 +18,30 @@ databaseChangeLog:
             columns:
               - column: {name: species, value: "pikachu"}
               - column: {name: level, value: "1"}
-              - column: {name: owner_id, value: "1"}
+              - column:
+                  name: owner_id
+                  valueComputed: "(SELECT id FROM trainer WHERE username = 'Ash')"
         - insert:
             tableName: pokemon
             columns:
               - column: {name: species, value: "bulbasaur"}
               - column: {name: level, value: "1"}
-              - column: {name: owner_id, value: "1"}
+              - column:
+                  name: owner_id
+                  valueComputed: "(SELECT id FROM trainer WHERE username = 'Ash')"
         - insert:
             tableName: pokemon
             columns:
               - column: {name: species, value: "psyduck"}
               - column: {name: level, value: "1"}
-              - column: {name: owner_id, value: "2"}
+              - column:
+                  name: owner_id
+                  valueComputed: "(SELECT id FROM trainer WHERE username = 'Misty')"
         - insert:
             tableName: pokemon
             columns:
               - column: {name: species, value: "giarados"}
               - column: {name: level, value: "1"}
-              - column: {name: owner_id, value: "2"}
+              - column:
+                  name: owner_id
+                  valueComputed: "(SELECT id FROM trainer WHERE username = 'Misty')"
