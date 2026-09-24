@@ -26,7 +26,7 @@ and complete deals.
 Actively under development.
 
 - [x] Project bootstrap
-- [ ] Database schema (trainer, pokemon, listing, trade_offer)
+- [x] Database schema (trainer, pokemon, listing, trade_offer)
 - [ ] REST API for listings
 - [ ] REST API for trade offers
 - [ ] Authentication (JWT)
@@ -67,7 +67,7 @@ poke-trade/
 
 ## Roadmap
 
-- [ ] Data model and Liquibase migrations
+- [x] Data model and Liquibase migrations
 - [ ] Listings CRUD
 - [ ] Offers and trade flow
 - [ ] Authentication (JWT)
