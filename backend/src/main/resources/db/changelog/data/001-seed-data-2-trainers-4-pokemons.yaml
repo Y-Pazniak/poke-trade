@@ -1,0 +1,47 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-seed-data-2-trainers-4-pokemons
+      author: y-pazniak
+      changes:
+        - insert:
+            tableName: trainer
+            columns:
+              - column: {name: username, value: "Ash"}
+              - column: {name: email, value: "ash_ketchum@pokemon.com"}
+        - insert:
+            tableName: trainer
+            columns:
+              - column: {name: username, value: "Misty"}
+              - column: {name: email, value: "misty_xoxo@pokemon.com"}
+        - insert:
+            tableName: pokemon
+            columns:
+              - column: {name: species, value: "pikachu"}
+              - column: {name: level, value: "1"}
+              - column:
+                  name: owner_id
+                  valueComputed: "(SELECT id FROM trainer WHERE username = 'Ash')"
+        - insert:
+            tableName: pokemon
+            columns:
+              - column: {name: species, value: "bulbasaur"}
+              - column: {name: level, value: "1"}
+              - column:
+                  name: owner_id
+                  valueComputed: "(SELECT id FROM trainer WHERE username = 'Ash')"
+        - insert:
+            tableName: pokemon
+            columns:
+              - column: {name: species, value: "psyduck"}
+              - column: {name: level, value: "1"}
+              - column:
+                  name: owner_id
+                  valueComputed: "(SELECT id FROM trainer WHERE username = 'Misty')"
+        - insert:
+            tableName: pokemon
+            columns:
+              - column: {name: species, value: "giarados"}
+              - column: {name: level, value: "1"}
+              - column:
+                  name: owner_id
+                  valueComputed: "(SELECT id FROM trainer WHERE username = 'Misty')"
