@@ -43,4 +43,12 @@ public class Listing {
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;
+
+    public static Listing create(Trainer seller, Pokemon pokemon, BigDecimal price) {
+        Listing listing = new Listing();
+        listing.seller = seller;
+        listing.pokemon = pokemon;
+        listing.price = price;
+        return listing;
+    }
 }

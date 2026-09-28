@@ -1,10 +1,20 @@
 package org.example.poketrade.service;
 
 import java.util.List;
+import java.util.Objects;
 
+import org.example.poketrade.dto.CreateListingRequest;
 import org.example.poketrade.dto.ListingResponse;
+import org.example.poketrade.entity.Listing;
+import org.example.poketrade.entity.Pokemon;
+import org.example.poketrade.entity.Trainer;
+import org.example.poketrade.exception.BusinessException;
+import org.example.poketrade.exception.NotFoundException;
 import org.example.poketrade.mapper.ListingMapper;
 import org.example.poketrade.repository.ListingRepository;
+import org.example.poketrade.repository.PokemonRepository;
+import org.example.poketrade.repository.TrainerRepository;
+import org.example.poketrade.security.CurrentUserProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,11 +25,33 @@ import lombok.RequiredArgsConstructor;
 public class ListingServiceImpl implements ListingService {
 
     private final ListingRepository listingRepository;
+    private final TrainerRepository trainerRepository;
+    private final PokemonRepository pokemonRepository;
     private final ListingMapper listingMapper;
+    private final CurrentUserProvider currentUserProvider;
+
 
     @Override
     @Transactional(readOnly = true)
     public List<ListingResponse> getAll() {
         return listingRepository.findAll().stream().map(listingMapper::toResponse).toList();
+    }
+
+    @Override
+    @Transactional
+    public ListingResponse create(CreateListingRequest createListingRequest) {
+        Long trainerId = currentUserProvider.getCurrentUserId();
+        Long pokemonId = createListingRequest.pokemonId();
+
+        Trainer trainer = trainerRepository.findById(trainerId).orElseThrow(() -> NotFoundException.trainer(trainerId));
+        Pokemon pokemon = pokemonRepository.findById(pokemonId).orElseThrow(() -> NotFoundException.pokemon(pokemonId));
+
+        if (!Objects.equals(trainerId, pokemon.getOwner().getId())) {
+            throw new BusinessException(
+                    "Pokemon does not belong the trainer. Owner: " + pokemon.getOwner().getId() + " Trainer: " + trainerId);
+        }
+
+        Listing listing = listingRepository.save(Listing.create(trainer, pokemon, createListingRequest.price()));
+        return listingMapper.toResponse(listing);
     }
 }

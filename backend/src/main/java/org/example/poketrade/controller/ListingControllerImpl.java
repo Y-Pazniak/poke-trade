@@ -2,6 +2,7 @@ package org.example.poketrade.controller;
 
 import java.util.List;
 
+import org.example.poketrade.dto.CreateListingRequest;
 import org.example.poketrade.dto.ListingResponse;
 import org.example.poketrade.service.ListingService;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,5 +18,10 @@ public class ListingControllerImpl implements ListingController {
     @Override
     public List<ListingResponse> getAll() {
         return listingService.getAll();
+    }
+
+    @Override
+    public ListingResponse create(CreateListingRequest createListingRequest) {
+        return listingService.create(createListingRequest);
     }
 }
