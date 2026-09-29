@@ -22,14 +22,18 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/v1/listings")
 public interface ListingController {
 
-    @Operation(summary = "Get all listings")
-    @GetMapping
-    List<ListingResponse> getAll();
-
     @Operation(summary = "Create a listing")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     ListingResponse create(@Valid @RequestBody CreateListingRequest request);
+
+    @Operation(summary = "Get listing by id")
+    @GetMapping("/{id}")
+    ListingResponse getById(@PathVariable Long id);
+
+    @Operation(summary = "Get all listings")
+    @GetMapping
+    List<ListingResponse> getAll();
 
     @Operation(summary = "Update a listing")
     @PatchMapping("/{id}")
