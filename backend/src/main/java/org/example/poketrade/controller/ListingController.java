@@ -6,6 +6,7 @@ import org.example.poketrade.dto.CreateListingRequest;
 import org.example.poketrade.dto.ListingResponse;
 import org.example.poketrade.dto.UpdateListingRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,4 +40,8 @@ public interface ListingController {
     @PatchMapping("/{id}")
     ListingResponse update(@PathVariable Long id, @Valid @RequestBody UpdateListingRequest request);
 
+    @Operation(summary = "Delete a listing")
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void delete(@PathVariable Long id);
 }

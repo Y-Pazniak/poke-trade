@@ -35,4 +35,9 @@ public class ListingControllerImpl implements ListingController {
     public ListingResponse update(Long id, UpdateListingRequest request) {
         return listingService.update(id, request);
     }
+
+    @Override
+    public void delete(Long id) {
+        listingService.delete(id);
+    }
 }

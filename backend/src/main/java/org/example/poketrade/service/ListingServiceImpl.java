@@ -77,4 +77,16 @@ public class ListingServiceImpl implements ListingService {
 
         return listingMapper.toResponse(listing);
     }
+
+    @Override
+    @Transactional
+    public void delete(Long id) {
+        Listing listing = listingRepository.findById(id).orElseThrow(() -> NotFoundException.listing(id));
+
+        if (!Objects.equals(currentUserProvider.getCurrentUserId(), listing.getSeller().getId())) {
+            throw new BusinessException("You are not allowed to delete another trainer listing.");
+        }
+
+        listingRepository.delete(listing);
+    }
 }
