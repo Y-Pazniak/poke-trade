@@ -53,9 +53,7 @@ public class ListingServiceImpl implements ListingService {
     @Override
     @Transactional(readOnly = true)
     public ListingResponse getById(Long id) {
-        Listing listing = listingRepository.findById(id).orElseThrow(() -> NotFoundException.listing(id));
-
-        return listingMapper.toResponse(listing);
+        return listingMapper.toResponse(getListingOrThrow(id));
     }
 
     @Override
@@ -67,14 +65,32 @@ public class ListingServiceImpl implements ListingService {
     @Override
     @Transactional
     public ListingResponse update(Long id, UpdateListingRequest request) {
-        Listing listing = listingRepository.findById(id).orElseThrow(() -> NotFoundException.listing(id));
+        Listing listing = getListingOrThrow(id);
 
-        if (!Objects.equals(currentUserProvider.getCurrentUserId(), listing.getSeller().getId())) {
-            throw new BusinessException("You are not allowed to update another trainer listing.");
-        }
+        assertOwner(listing);
 
         listing.update(request.price(), request.description());
 
         return listingMapper.toResponse(listing);
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long id) {
+        Listing listing = getListingOrThrow(id);
+
+        assertOwner(listing);
+
+        listingRepository.delete(listing);
+    }
+
+    private Listing getListingOrThrow(Long id) {
+        return listingRepository.findById(id).orElseThrow(() -> NotFoundException.listing(id));
+    }
+
+    private void assertOwner(Listing listing) {
+        if (!Objects.equals(currentUserProvider.getCurrentUserId(), listing.getSeller().getId())) {
+            throw new BusinessException("You are not allowed to manipulate another trainer listing.");
+        }
     }
 }

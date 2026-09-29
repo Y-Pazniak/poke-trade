@@ -15,4 +15,6 @@ public interface ListingService {
     List<ListingResponse> getAll();
 
     ListingResponse update(Long id, UpdateListingRequest request);
+
+    void delete(Long id);
 }
