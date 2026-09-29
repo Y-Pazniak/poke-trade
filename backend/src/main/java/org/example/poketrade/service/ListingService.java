@@ -8,10 +8,11 @@ import org.example.poketrade.dto.UpdateListingRequest;
 
 public interface ListingService {
 
-    ListingResponse create(CreateListingRequest createListingRequest);
+    ListingResponse create(CreateListingRequest request);
+
+    ListingResponse getById(Long id);
 
     List<ListingResponse> getAll();
 
-    ListingResponse update(Long id, UpdateListingRequest updateListingRequest);
-
+    ListingResponse update(Long id, UpdateListingRequest request);
 }

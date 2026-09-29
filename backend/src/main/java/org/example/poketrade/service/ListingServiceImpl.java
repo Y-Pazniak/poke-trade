@@ -31,13 +31,6 @@ public class ListingServiceImpl implements ListingService {
     private final ListingMapper listingMapper;
     private final CurrentUserProvider currentUserProvider;
 
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<ListingResponse> getAll() {
-        return listingRepository.findAll().stream().map(listingMapper::toResponse).toList();
-    }
-
     @Override
     @Transactional
     public ListingResponse create(CreateListingRequest request) {
@@ -55,6 +48,20 @@ public class ListingServiceImpl implements ListingService {
         Listing listing = listingRepository.save(Listing.create(trainer, pokemon, request.price(),
                 request.description()));
         return listingMapper.toResponse(listing);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ListingResponse getById(Long id) {
+        Listing listing = listingRepository.findById(id).orElseThrow(() -> NotFoundException.listing(id));
+
+        return listingMapper.toResponse(listing);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ListingResponse> getAll() {
+        return listingRepository.findAll().stream().map(listingMapper::toResponse).toList();
     }
 
     @Override

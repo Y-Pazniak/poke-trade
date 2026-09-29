@@ -17,13 +17,18 @@ public class ListingControllerImpl implements ListingController {
     private final ListingService listingService;
 
     @Override
-    public List<ListingResponse> getAll() {
-        return listingService.getAll();
+    public ListingResponse create(CreateListingRequest request) {
+        return listingService.create(request);
     }
 
     @Override
-    public ListingResponse create(CreateListingRequest request) {
-        return listingService.create(request);
+    public ListingResponse getById(Long id) {
+        return listingService.getById(id);
+    }
+
+    @Override
+    public List<ListingResponse> getAll() {
+        return listingService.getAll();
     }
 
     @Override
