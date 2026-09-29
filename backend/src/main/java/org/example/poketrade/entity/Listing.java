@@ -40,15 +40,29 @@ public class Listing {
     @Column(name = "price", precision = 10, scale = 2)
     private BigDecimal price;
 
+    @Column(name = "description", length = 1000)
+    private String description;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;
 
-    public static Listing create(Trainer seller, Pokemon pokemon, BigDecimal price) {
+    public static Listing create(Trainer seller, Pokemon pokemon, BigDecimal price, String description) {
         Listing listing = new Listing();
         listing.seller = seller;
         listing.pokemon = pokemon;
         listing.price = price;
+        listing.description = description;
         return listing;
+    }
+
+    public void update(BigDecimal price, String description) {
+        if (price != null) {
+            this.price = price;
+        }
+
+        if (description != null) {
+            this.description = description;
+        }
     }
 }

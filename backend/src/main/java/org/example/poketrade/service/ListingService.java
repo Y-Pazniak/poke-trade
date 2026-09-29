@@ -4,8 +4,14 @@ import java.util.List;
 
 import org.example.poketrade.dto.CreateListingRequest;
 import org.example.poketrade.dto.ListingResponse;
+import org.example.poketrade.dto.UpdateListingRequest;
 
 public interface ListingService {
-    List<ListingResponse> getAll();
+
     ListingResponse create(CreateListingRequest createListingRequest);
+
+    List<ListingResponse> getAll();
+
+    ListingResponse update(Long id, UpdateListingRequest updateListingRequest);
+
 }

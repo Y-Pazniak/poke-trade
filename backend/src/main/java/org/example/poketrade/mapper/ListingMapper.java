@@ -17,6 +17,7 @@ public class ListingMapper {
                 toResponse(listing.getSeller()),
                 toResponse(listing.getPokemon()),
                 listing.getPrice(),
+                listing.getDescription(),
                 listing.getCreatedAt()
         );
     }

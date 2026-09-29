@@ -5,6 +5,7 @@ import java.util.Objects;
 
 import org.example.poketrade.dto.CreateListingRequest;
 import org.example.poketrade.dto.ListingResponse;
+import org.example.poketrade.dto.UpdateListingRequest;
 import org.example.poketrade.entity.Listing;
 import org.example.poketrade.entity.Pokemon;
 import org.example.poketrade.entity.Trainer;
@@ -39,19 +40,34 @@ public class ListingServiceImpl implements ListingService {
 
     @Override
     @Transactional
-    public ListingResponse create(CreateListingRequest createListingRequest) {
+    public ListingResponse create(CreateListingRequest request) {
         Long trainerId = currentUserProvider.getCurrentUserId();
-        Long pokemonId = createListingRequest.pokemonId();
+        Long pokemonId = request.pokemonId();
 
         Trainer trainer = trainerRepository.findById(trainerId).orElseThrow(() -> NotFoundException.trainer(trainerId));
         Pokemon pokemon = pokemonRepository.findById(pokemonId).orElseThrow(() -> NotFoundException.pokemon(pokemonId));
 
         if (!Objects.equals(trainerId, pokemon.getOwner().getId())) {
             throw new BusinessException(
-                    "Pokemon does not belong the trainer. Owner: " + pokemon.getOwner().getId() + " Trainer: " + trainerId);
+                    "Pokemon does not belong to this trainer");
         }
 
-        Listing listing = listingRepository.save(Listing.create(trainer, pokemon, createListingRequest.price()));
+        Listing listing = listingRepository.save(Listing.create(trainer, pokemon, request.price(),
+                request.description()));
+        return listingMapper.toResponse(listing);
+    }
+
+    @Override
+    @Transactional
+    public ListingResponse update(Long id, UpdateListingRequest request) {
+        Listing listing = listingRepository.findById(id).orElseThrow(() -> NotFoundException.listing(id));
+
+        if (!Objects.equals(currentUserProvider.getCurrentUserId(), listing.getSeller().getId())) {
+            throw new BusinessException("You are not allowed to update another trainer listing.");
+        }
+
+        listing.update(request.price(), request.description());
+
         return listingMapper.toResponse(listing);
     }
 }

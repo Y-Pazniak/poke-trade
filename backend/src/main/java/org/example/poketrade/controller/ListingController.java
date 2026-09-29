@@ -4,8 +4,11 @@ import java.util.List;
 
 import org.example.poketrade.dto.CreateListingRequest;
 import org.example.poketrade.dto.ListingResponse;
+import org.example.poketrade.dto.UpdateListingRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,8 +26,13 @@ public interface ListingController {
     @GetMapping
     List<ListingResponse> getAll();
 
-    @Operation(summary = "Post a listing")
+    @Operation(summary = "Create a listing")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    ListingResponse create(@Valid @RequestBody CreateListingRequest createListingRequest);
+    ListingResponse create(@Valid @RequestBody CreateListingRequest request);
+
+    @Operation(summary = "Update a listing")
+    @PatchMapping("/{id}")
+    ListingResponse update(@PathVariable Long id, @Valid @RequestBody UpdateListingRequest request);
+
 }

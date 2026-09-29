@@ -8,6 +8,7 @@ public record ListingResponse(
         TrainerResponse seller,
         PokemonResponse pokemon,
         BigDecimal price,
+        String description,
         OffsetDateTime createdAt) {
 
 }
