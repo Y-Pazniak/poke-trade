@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.example.poketrade.dto.CreateListingRequest;
 import org.example.poketrade.dto.ListingResponse;
+import org.example.poketrade.dto.UpdateListingRequest;
 import org.example.poketrade.service.ListingService;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,7 +22,12 @@ public class ListingControllerImpl implements ListingController {
     }
 
     @Override
-    public ListingResponse create(CreateListingRequest createListingRequest) {
-        return listingService.create(createListingRequest);
+    public ListingResponse create(CreateListingRequest request) {
+        return listingService.create(request);
+    }
+
+    @Override
+    public ListingResponse update(Long id, UpdateListingRequest request) {
+        return listingService.update(id, request);
     }
 }
