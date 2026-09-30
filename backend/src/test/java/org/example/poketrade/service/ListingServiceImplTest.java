@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.example.poketrade.TestConstants;
@@ -44,16 +45,16 @@ class ListingServiceImplTest {
 
     @Test
     void getById_shouldReturnListingResponse_whenListingExists() {
-        Listing listing = TestBuilder.createListing();
-        ListingResponse expected = TestBuilder.createListingResponse();
-        when(listingRepository.findById(TestConstants.LISTING_ID)).thenReturn(Optional.of(listing));
-        when(listingMapper.toResponse(listing)).thenReturn(expected);
+        Listing expectedListing = TestBuilder.createListing();
+        ListingResponse expectedResponse = TestBuilder.createListingResponse();
+        when(listingRepository.findById(TestConstants.LISTING_ID)).thenReturn(Optional.of(expectedListing));
+        when(listingMapper.toResponse(expectedListing)).thenReturn(expectedResponse);
 
-        ListingResponse actual = listingService.getById(TestConstants.LISTING_ID);
+        ListingResponse actualResponse = listingService.getById(TestConstants.LISTING_ID);
 
-        assertThat(actual).isEqualTo(expected);
+        assertThat(actualResponse).isEqualTo(expectedResponse);
         verify(listingRepository, times(1)).findById(TestConstants.LISTING_ID);
-        verify(listingMapper, times(1)).toResponse(listing);
+        verify(listingMapper, times(1)).toResponse(expectedListing);
         verifyNoInteractions(pokemonRepository, trainerRepository, currentUserProvider);
     }
 
@@ -66,6 +67,37 @@ class ListingServiceImplTest {
                 .hasMessage(NotFoundException.LISTING_NOT_FOUND_FORMAT.formatted(TestConstants.LISTING_ID));
 
         verify(listingRepository, times(1)).findById(TestConstants.LISTING_ID);
+        verifyNoInteractions(pokemonRepository, trainerRepository, currentUserProvider, listingMapper);
+    }
+
+    @Test
+    void getAll_shouldReturnListResponse() {
+        Listing expectedListing1 = TestBuilder.createListing();
+        Listing expectedListing2 = TestBuilder.createListing();
+        ListingResponse expectedResponse1 = TestBuilder.createListingResponse();
+        ListingResponse expectedResponse2 = TestBuilder.createListingResponse();
+
+        when(listingRepository.findAll()).thenReturn(List.of(expectedListing1, expectedListing2));
+        when(listingMapper.toResponse(expectedListing1)).thenReturn(expectedResponse1);
+        when(listingMapper.toResponse(expectedListing2)).thenReturn(expectedResponse2);
+
+        List<ListingResponse> actual = listingService.getAll();
+
+        assertThat(actual).containsExactly(expectedResponse1, expectedResponse2);
+        verify(listingRepository, times(1)).findAll();
+        verify(listingMapper).toResponse(expectedListing1);
+        verify(listingMapper).toResponse(expectedListing2);
+        verifyNoInteractions(pokemonRepository, trainerRepository, currentUserProvider);
+    }
+
+    @Test
+    void getAll_shouldReturnEmptyList_whenNoListings() {
+        when(listingRepository.findAll()).thenReturn(List.of());
+
+        List<ListingResponse> actual = listingService.getAll();
+
+        assertThat(actual).isEmpty();
+        verify(listingRepository, times(1)).findAll();
         verifyNoInteractions(pokemonRepository, trainerRepository, currentUserProvider, listingMapper);
     }
 }
