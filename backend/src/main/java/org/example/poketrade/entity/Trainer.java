@@ -34,4 +34,11 @@ public class Trainer {
     @CreationTimestamp
     @Column(name = "created_at", updatable = false, nullable = false)
     private OffsetDateTime createdAt;
+
+    public static Trainer create(String username, String email) {
+        Trainer trainer = new Trainer();
+        trainer.username = username;
+        trainer.email = email;
+        return trainer;
+    }
 }
