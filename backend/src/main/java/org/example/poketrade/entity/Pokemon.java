@@ -41,4 +41,12 @@ public class Pokemon {
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;
+
+    public static Pokemon create(String species, Integer level, Trainer owner) {
+        Pokemon pokemon = new Pokemon();
+        pokemon.species = species;
+        pokemon.level = level;
+        pokemon.owner = owner;
+        return pokemon;
+    }
 }
