@@ -1,6 +1,7 @@
 package org.example.poketrade.builder;
 
 import org.example.poketrade.TestConstants;
+import org.example.poketrade.dto.CreateListingRequest;
 import org.example.poketrade.dto.ListingResponse;
 import org.example.poketrade.dto.PokemonResponse;
 import org.example.poketrade.dto.TrainerResponse;
@@ -38,6 +39,14 @@ public class TestBuilder {
                 TestConstants.LISTING_PRICE,
                 TestConstants.LISTING_DESCRIPTION,
                 TestConstants.LISTING_DATE
+        );
+    }
+
+    public static CreateListingRequest createListingRequest() {
+        return new CreateListingRequest(
+                TestConstants.POKEMON_ID,
+                TestConstants.POKEMON_PRICE,
+                TestConstants.POKEMON_DESCRIPTION
         );
     }
 

@@ -15,6 +15,7 @@ import java.util.Optional;
 
 import org.example.poketrade.TestConstants;
 import org.example.poketrade.builder.TestBuilder;
+import org.example.poketrade.dto.CreateListingRequest;
 import org.example.poketrade.dto.ListingResponse;
 import org.example.poketrade.entity.Listing;
 import org.example.poketrade.entity.Pokemon;
@@ -28,6 +29,7 @@ import org.example.poketrade.repository.TrainerRepository;
 import org.example.poketrade.security.CurrentUserProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -48,6 +50,97 @@ class ListingServiceImplTest {
 
     @InjectMocks
     private ListingServiceImpl listingService;
+
+    @Test
+    void create_shouldCreateListing_whenTrainerAndPokemonExistAndPokemonBelongsToTrainer() {
+        CreateListingRequest request = TestBuilder.createListingRequest();
+        ListingResponse expected = TestBuilder.createListingResponse();
+
+        Trainer trainer = mock(Trainer.class);
+        Pokemon pokemon = mock(Pokemon.class);
+        Listing savedListing = TestBuilder.createListing();
+
+        when(currentUserProvider.getCurrentUserId()).thenReturn(TestConstants.TRAINER_ID);
+        when(trainerRepository.findById(TestConstants.TRAINER_ID)).thenReturn(Optional.of(trainer));
+        when(pokemonRepository.findById(TestConstants.POKEMON_ID)).thenReturn(Optional.of(pokemon));
+        when(pokemon.getOwner()).thenReturn(trainer);
+        when(trainer.getId()).thenReturn(TestConstants.TRAINER_ID);
+        when(listingRepository.save(any(Listing.class))).thenReturn(savedListing);
+        when(listingMapper.toResponse(savedListing)).thenReturn(expected);
+
+        ListingResponse actual = listingService.create(request);
+
+        assertThat(actual).isEqualTo(expected);
+
+        ArgumentCaptor<Listing> captor = ArgumentCaptor.forClass(Listing.class);
+        verify(listingRepository, times(1)).save(captor.capture());
+
+        Listing toSave = captor.getValue();
+        assertThat(toSave.getSeller()).isEqualTo(trainer);
+        assertThat(toSave.getPokemon()).isEqualTo(pokemon);
+        assertThat(toSave.getPrice()).isEqualTo(request.price());
+        assertThat(toSave.getDescription()).isEqualTo(request.description());
+
+        verify(currentUserProvider, times(1)).getCurrentUserId();
+        verify(trainerRepository, times(1)).findById(TestConstants.TRAINER_ID);
+        verify(pokemonRepository, times(1)).findById(request.pokemonId());
+        verify(listingMapper, times(1)).toResponse(savedListing);
+    }
+
+    @Test
+    void create_shouldThrowNotFoundException_whenTrainerDoesNotExist() {
+        when(currentUserProvider.getCurrentUserId()).thenReturn(TestConstants.OTHER_TRAINER_ID);
+        when(trainerRepository.findById(TestConstants.OTHER_TRAINER_ID)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> listingService.create(TestBuilder.createListingRequest()))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage(NotFoundException.TRAINER_NOT_FOUND_FORMAT.formatted(TestConstants.OTHER_TRAINER_ID));
+
+        verify(currentUserProvider, times(1)).getCurrentUserId();
+        verify(trainerRepository, times(1)).findById(TestConstants.OTHER_TRAINER_ID);
+        verify(listingRepository, never()).save(any());
+        verifyNoInteractions(pokemonRepository, listingMapper);
+    }
+
+    @Test
+    void create_shouldThrowNotFoundException_whenPokemonDoesNotExist() {
+        Trainer trainer = mock(Trainer.class);
+        when(currentUserProvider.getCurrentUserId()).thenReturn(TestConstants.TRAINER_ID);
+        when(trainerRepository.findById(TestConstants.TRAINER_ID)).thenReturn(Optional.of(trainer));
+        when(pokemonRepository.findById(TestConstants.POKEMON_ID)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> listingService.create(TestBuilder.createListingRequest()))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage(NotFoundException.POKEMON_NOT_FOUND_FORMAT.formatted(TestConstants.POKEMON_ID));
+
+        verify(currentUserProvider, times(1)).getCurrentUserId();
+        verify(trainerRepository, times(1)).findById(TestConstants.TRAINER_ID);
+        verify(pokemonRepository, times(1)).findById(TestConstants.POKEMON_ID);
+        verify(listingRepository, never()).save(any());
+        verifyNoInteractions(listingMapper);
+    }
+
+    @Test
+    void create_shouldThrowBusinessException_whenPokemonDoesNotBelongToTrainer() {
+        Trainer trainer = mock(Trainer.class);
+        Pokemon pokemon = mock(Pokemon.class);
+
+        when(currentUserProvider.getCurrentUserId()).thenReturn(TestConstants.OTHER_TRAINER_ID);
+        when(trainerRepository.findById(TestConstants.OTHER_TRAINER_ID)).thenReturn(Optional.of(trainer));
+        when(pokemonRepository.findById(TestConstants.POKEMON_ID)).thenReturn(Optional.of(pokemon));
+        when(pokemon.getOwner()).thenReturn(trainer);
+        when(trainer.getId()).thenReturn(TestConstants.TRAINER_ID);
+
+        assertThatThrownBy(() -> listingService.create(TestBuilder.createListingRequest()))
+                .hasMessage(BusinessException.WRONG_OWNER)
+                .isInstanceOf(BusinessException.class);
+
+        verify(currentUserProvider, times(1)).getCurrentUserId();
+        verify(trainerRepository, times(1)).findById(TestConstants.OTHER_TRAINER_ID);
+        verify(pokemonRepository, times(1)).findById(TestConstants.POKEMON_ID);
+        verify(listingRepository, never()).save(any());
+        verifyNoInteractions(listingMapper);
+    }
 
     @Test
     void getById_shouldReturnListingResponse_whenListingExists() {
