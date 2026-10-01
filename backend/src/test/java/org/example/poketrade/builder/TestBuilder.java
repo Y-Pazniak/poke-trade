@@ -21,6 +21,15 @@ public class TestBuilder {
         );
     }
 
+    public static Listing createListing(Trainer trainer, Pokemon pokemon) {
+        return Listing.create(
+                trainer,
+                pokemon,
+                TestConstants.LISTING_PRICE,
+                TestConstants.LISTING_DESCRIPTION
+        );
+    }
+
     public static ListingResponse createListingResponse() {
         return new ListingResponse(
                 TestConstants.LISTING_ID,

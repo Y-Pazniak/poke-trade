@@ -2,6 +2,9 @@ package org.example.poketrade.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -14,6 +17,9 @@ import org.example.poketrade.TestConstants;
 import org.example.poketrade.builder.TestBuilder;
 import org.example.poketrade.dto.ListingResponse;
 import org.example.poketrade.entity.Listing;
+import org.example.poketrade.entity.Pokemon;
+import org.example.poketrade.entity.Trainer;
+import org.example.poketrade.exception.BusinessException;
 import org.example.poketrade.exception.NotFoundException;
 import org.example.poketrade.mapper.ListingMapper;
 import org.example.poketrade.repository.ListingRepository;
@@ -99,5 +105,55 @@ class ListingServiceImplTest {
         assertThat(actual).isEmpty();
         verify(listingRepository, times(1)).findAll();
         verifyNoInteractions(pokemonRepository, trainerRepository, currentUserProvider, listingMapper);
+    }
+
+    @Test
+    void delete_shouldDelete_whenOwnerDeletesOwnListing() {
+        Trainer trainer = mock(Trainer.class);
+        Pokemon pokemon = mock(Pokemon.class);
+        Listing listing = TestBuilder.createListing(trainer, pokemon);
+
+        when(trainer.getId()).thenReturn(TestConstants.TRAINER_ID);
+        when(currentUserProvider.getCurrentUserId()).thenReturn(TestConstants.TRAINER_ID);
+        when(listingRepository.findById(TestConstants.LISTING_ID)).thenReturn(Optional.of(listing));
+
+        listingService.delete(TestConstants.LISTING_ID);
+
+        verify(listingRepository, times(1)).findById(TestConstants.LISTING_ID);
+        verify(listingRepository, times(1)).delete(listing);
+        verify(currentUserProvider, times(1)).getCurrentUserId();
+        verifyNoInteractions(pokemonRepository, trainerRepository, listingMapper);
+    }
+
+    @Test
+    void delete_shouldThrowNotFoundException_whenListingDoesNotExist() {
+        when(listingRepository.findById(TestConstants.LISTING_ID)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> listingService.delete(TestConstants.LISTING_ID))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage(NotFoundException.LISTING_NOT_FOUND_FORMAT.formatted(TestConstants.LISTING_ID));
+
+        verify(listingRepository, times(1)).findById(TestConstants.LISTING_ID);
+        verify(listingRepository, never()).delete(any());
+        verifyNoInteractions(pokemonRepository, trainerRepository, currentUserProvider, listingMapper);
+    }
+
+    @Test
+    void delete_shouldThrowBusinessException_whenListingDoesNotBelongToTheTrainer() {
+        Trainer trainer = mock(Trainer.class);
+        Pokemon pokemon = mock(Pokemon.class);
+        Listing listing = TestBuilder.createListing(trainer, pokemon);
+
+        when(trainer.getId()).thenReturn(TestConstants.TRAINER_ID);
+        when(currentUserProvider.getCurrentUserId()).thenReturn(TestConstants.OTHER_TRAINER_ID);
+        when(listingRepository.findById(TestConstants.LISTING_ID)).thenReturn(Optional.of(listing));
+
+        assertThatThrownBy(() -> listingService.delete(TestConstants.LISTING_ID))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(BusinessException.WRONG_OWNER);
+
+        verify(listingRepository, times(1)).findById(TestConstants.LISTING_ID);
+        verify(listingRepository, never()).delete(any());
+        verifyNoInteractions(pokemonRepository, trainerRepository, listingMapper);
     }
 }

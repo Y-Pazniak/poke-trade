@@ -12,6 +12,7 @@ public class TestConstants {
     public static final OffsetDateTime LISTING_DATE = OffsetDateTime.of(2026, 1, 1, 12, 0, 0, 0, ZoneOffset.UTC);
 
     public static final Long TRAINER_ID = 1L;
+    public static final Long OTHER_TRAINER_ID = 1L;
     public static final String TRAINER_NAME = "Ash";
     public static final String TRAINER_EMAIL = "ketchum@gmail.com";
 

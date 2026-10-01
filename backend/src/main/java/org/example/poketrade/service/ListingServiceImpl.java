@@ -41,8 +41,7 @@ public class ListingServiceImpl implements ListingService {
         Pokemon pokemon = pokemonRepository.findById(pokemonId).orElseThrow(() -> NotFoundException.pokemon(pokemonId));
 
         if (!Objects.equals(trainerId, pokemon.getOwner().getId())) {
-            throw new BusinessException(
-                    "Pokemon does not belong to this trainer");
+            throw new BusinessException(BusinessException.WRONG_OWNER);
         }
 
         Listing listing = listingRepository.save(Listing.create(trainer, pokemon, request.price(),
@@ -90,7 +89,7 @@ public class ListingServiceImpl implements ListingService {
 
     private void assertOwner(Listing listing) {
         if (!Objects.equals(currentUserProvider.getCurrentUserId(), listing.getSeller().getId())) {
-            throw new BusinessException("You are not allowed to manipulate another trainer listing.");
+            throw new BusinessException(BusinessException.WRONG_OWNER);
         }
     }
 }
