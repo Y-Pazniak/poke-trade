@@ -22,4 +22,7 @@ public class TestConstants {
     public static final BigDecimal POKEMON_PRICE = new BigDecimal("123.45");
     public static final String POKEMON_DESCRIPTION = "pokemon description";
 
+    public static final BigDecimal UPDATED_PRICE = new BigDecimal("67.89");
+    public static final String UPDATED_DESCRIPTION = "updated description";
+
 }

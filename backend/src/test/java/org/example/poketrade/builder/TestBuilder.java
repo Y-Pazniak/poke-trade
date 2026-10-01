@@ -5,6 +5,7 @@ import org.example.poketrade.dto.CreateListingRequest;
 import org.example.poketrade.dto.ListingResponse;
 import org.example.poketrade.dto.PokemonResponse;
 import org.example.poketrade.dto.TrainerResponse;
+import org.example.poketrade.dto.UpdateListingRequest;
 import org.example.poketrade.entity.Listing;
 import org.example.poketrade.entity.Pokemon;
 import org.example.poketrade.entity.Trainer;
@@ -47,6 +48,13 @@ public class TestBuilder {
                 TestConstants.POKEMON_ID,
                 TestConstants.POKEMON_PRICE,
                 TestConstants.POKEMON_DESCRIPTION
+        );
+    }
+
+    public static UpdateListingRequest createUpdateListingRequest() {
+        return new UpdateListingRequest(
+                TestConstants.UPDATED_PRICE,
+                TestConstants.UPDATED_DESCRIPTION
         );
     }
 

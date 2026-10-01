@@ -17,6 +17,7 @@ import org.example.poketrade.TestConstants;
 import org.example.poketrade.builder.TestBuilder;
 import org.example.poketrade.dto.CreateListingRequest;
 import org.example.poketrade.dto.ListingResponse;
+import org.example.poketrade.dto.UpdateListingRequest;
 import org.example.poketrade.entity.Listing;
 import org.example.poketrade.entity.Pokemon;
 import org.example.poketrade.entity.Trainer;
@@ -198,6 +199,62 @@ class ListingServiceImplTest {
         assertThat(actual).isEmpty();
         verify(listingRepository, times(1)).findAll();
         verifyNoInteractions(pokemonRepository, trainerRepository, currentUserProvider, listingMapper);
+    }
+
+    @Test
+    void update_shouldReturnListingResponse_whenUpdatedSuccessfully() {
+        Trainer trainer = mock(Trainer.class);
+        Pokemon pokemon = mock(Pokemon.class);
+        UpdateListingRequest request = TestBuilder.createUpdateListingRequest();
+        ListingResponse expectedResponse = TestBuilder.createListingResponse();
+        Listing listing = TestBuilder.createListing(trainer, pokemon);
+
+        when(listingRepository.findById(TestConstants.LISTING_ID)).thenReturn(Optional.of(listing));
+        when(currentUserProvider.getCurrentUserId()).thenReturn(TestConstants.TRAINER_ID);
+        when(trainer.getId()).thenReturn(TestConstants.TRAINER_ID);
+        when(listingMapper.toResponse(listing)).thenReturn(expectedResponse);
+
+        ListingResponse actualResponse = listingService.update(TestConstants.LISTING_ID, request);
+
+        assertThat(actualResponse).isEqualTo(expectedResponse);
+        assertThat(listing.getPrice()).isEqualTo(request.price());
+        assertThat(listing.getDescription()).isEqualTo(request.description());
+
+        verify(listingRepository, times(1)).findById(TestConstants.LISTING_ID);
+        verify(currentUserProvider, times(1)).getCurrentUserId();
+        verify(listingMapper, times(1)).toResponse(listing);
+        verifyNoInteractions(pokemonRepository, trainerRepository);
+    }
+
+    @Test
+    void update_shouldThrowNotFoundException_whenListingDoesNotExist() {
+        when(listingRepository.findById(TestConstants.LISTING_ID)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> listingService.update(TestConstants.LISTING_ID, TestBuilder.createUpdateListingRequest()))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage(NotFoundException.LISTING_NOT_FOUND_FORMAT.formatted(TestConstants.LISTING_ID));
+
+        verify(listingRepository, times(1)).findById(TestConstants.LISTING_ID);
+        verifyNoInteractions(pokemonRepository, trainerRepository, currentUserProvider, listingMapper);
+    }
+
+    @Test
+    void update_shouldThrowBusinessException_whenListingDoesNotBelongToTheTrainer() {
+        Trainer trainer = mock(Trainer.class);
+        Pokemon pokemon = mock(Pokemon.class);
+        Listing listing = TestBuilder.createListing(trainer, pokemon);
+
+        when(listingRepository.findById(TestConstants.LISTING_ID)).thenReturn(Optional.of(listing));
+        when(currentUserProvider.getCurrentUserId()).thenReturn(TestConstants.TRAINER_ID);
+        when(listing.getSeller().getId()).thenReturn(TestConstants.OTHER_TRAINER_ID);
+
+        assertThatThrownBy(() -> listingService.update(TestConstants.LISTING_ID, TestBuilder.createUpdateListingRequest()))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(BusinessException.WRONG_OWNER);
+
+        verify(listingRepository, times(1)).findById(TestConstants.LISTING_ID);
+        verify(currentUserProvider, times(1)).getCurrentUserId();
+        verifyNoInteractions(pokemonRepository, trainerRepository, listingMapper);
     }
 
     @Test
