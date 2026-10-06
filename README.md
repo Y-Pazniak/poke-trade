@@ -1,5 +1,8 @@
 # PokeTrade
 
+[![CI](https://github.com/Y-Pazniak/poke-trade/actions/workflows/ci.yml/badge.svg)](https://github.com/Y-Pazniak/poke-trade/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/Y-Pazniak/poke-trade/graph/badge.svg)](https://codecov.io/gh/Y-Pazniak/poke-trade)
+
 Pet project: a Pokémon trading exchange between trainers.
 
 Trainers post listings of their Pokémon (for sale or trade), browse other listings,
