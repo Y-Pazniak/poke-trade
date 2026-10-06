@@ -80,7 +80,7 @@ public class ListingServiceImpl implements ListingService {
 
         assertOwner(listing);
 
-        listingRepository.delete(listing);
+        listingRepository.delete(listing);//hello
     }
 
     private Listing getListingOrThrow(Long id) {
