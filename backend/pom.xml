@@ -142,6 +142,7 @@
             <exclude>**/entity/**</exclude>
             <exclude>**/config/**</exclude>
             <exclude>**/PokeTradeApplication.class</exclude>
+            <exclude>**/ErrorCode.class</exclude>
           </excludes>
         </configuration>
         <executions>
