@@ -1,4 +1,4 @@
-    package org.example.poketrade.service;
+    package org.example.poketrade.mapper;
 
     import static org.assertj.core.api.Assertions.assertThat;
 
@@ -9,7 +9,6 @@
     import org.example.poketrade.entity.Listing;
     import org.example.poketrade.entity.Pokemon;
     import org.example.poketrade.entity.Trainer;
-    import org.example.poketrade.mapper.ListingMapper;
     import org.junit.jupiter.api.Test;
 
     class ListingMapperTest {
