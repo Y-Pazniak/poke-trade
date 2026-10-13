@@ -9,18 +9,20 @@ import org.example.poketrade.dto.UpdateListingRequest;
 import org.example.poketrade.entity.Listing;
 import org.example.poketrade.entity.Pokemon;
 import org.example.poketrade.entity.Trainer;
+import org.springframework.test.util.ReflectionTestUtils;
 
 public class TestBuilder {
 
     public static Listing createListing() {
         Trainer trainer = createTrainer();
         Pokemon pokemon = createPokemon(trainer);
-        return Listing.create(
-                trainer,
+        Listing listing = Listing.create(trainer,
                 pokemon,
                 TestConstants.LISTING_PRICE,
-                TestConstants.LISTING_DESCRIPTION
-        );
+                TestConstants.LISTING_DESCRIPTION);
+        ReflectionTestUtils.setField(listing, "id", TestConstants.LISTING_ID);
+        ReflectionTestUtils.setField(listing, "createdAt", TestConstants.LISTING_DATE);
+        return listing;
     }
 
     public static Listing createListing(Trainer trainer, Pokemon pokemon) {
@@ -58,28 +60,29 @@ public class TestBuilder {
         );
     }
 
-    private static Trainer createTrainer() {
-        return Trainer.create(
-                TestConstants.TRAINER_NAME,
-                TestConstants.TRAINER_EMAIL
-        );
+    public static Trainer createTrainer() {
+        Trainer trainer = Trainer.create(TestConstants.TRAINER_NAME,
+                TestConstants.TRAINER_EMAIL);
+        ReflectionTestUtils.setField(trainer, "id", TestConstants.TRAINER_ID);
+        return trainer;
     }
 
-    private static Pokemon createPokemon(Trainer trainer) {
-        return Pokemon.create(
+    public static Pokemon createPokemon(Trainer trainer) {
+        Pokemon pokemon = Pokemon.create(
                 TestConstants.POKEMON_SPECIES,
                 TestConstants.POKEMON_LEVEL,
-                trainer
-        );
+                trainer);
+        ReflectionTestUtils.setField(pokemon, "id", TestConstants.POKEMON_ID);
+        return pokemon;
     }
 
-    private static TrainerResponse createTrainerResponse() {
+    public static TrainerResponse createTrainerResponse() {
         return new TrainerResponse(
                 TestConstants.TRAINER_ID,
                 TestConstants.TRAINER_NAME);
     }
 
-    private static PokemonResponse createPokemonResponse() {
+    public static PokemonResponse createPokemonResponse() {
         return new PokemonResponse(
                 TestConstants.POKEMON_ID,
                 TestConstants.POKEMON_SPECIES,
